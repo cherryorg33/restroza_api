@@ -10,6 +10,7 @@ import { GLOBAL_CONFIG } from "./config/global.config";
 import { LoggerService } from "./modules/logger/logger.service";
 // import { InvalidFormExceptionFilter } from "./common/exceptions/invalid-form.exception";
 import { HttpExceptionFilter } from "./common/filters/http-exception.filter";
+import * as dotenv from "dotenv";
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule, {
@@ -22,6 +23,7 @@ async function bootstrap() {
   app.setGlobalPrefix(API_PREFIX);
 
   // ✅ Exception Filters
+  dotenv.config();
 
   // ✅ get logger
   const logger = await app.resolve(LoggerService);
@@ -44,13 +46,13 @@ async function bootstrap() {
   app.use(cookieParser());
 
   // ✅ Global validation
-  app.useGlobalPipes(
-    new ValidationPipe({
-      whitelist: true, // remove unwanted fields
-      forbidNonWhitelisted: true, // throw error
-      transform: true, // auto transform DTO
-    })
-  );
+  // app.useGlobalPipes(
+  //   new ValidationPipe({
+  //     whitelist: true, // remove unwanted fields
+  //     forbidNonWhitelisted: true, // throw error
+  //     transform: true, // auto transform DTO
+  //   })
+  // );
 
   // ✅ Start server
   const PORT = process.env.PORT || GLOBAL_CONFIG.nest.port;

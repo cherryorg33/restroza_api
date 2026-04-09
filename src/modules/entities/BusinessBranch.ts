@@ -1,58 +1,61 @@
-import { Column, Entity, PrimaryGeneratedColumn } from "typeorm";
+import {
+  Column,
+  Entity,
+  Index,
+  OneToMany,
+  PrimaryGeneratedColumn,
+} from "typeorm";
+import { Userroles } from "./Userroles";
 
-@Entity("business_branch", { schema: "restroza" })
+@Index("branchEmail", ["branchEmail"], { unique: true })
+@Index("idx_branchEmail", ["branchEmail"], {})
+@Index("idx_branchPhone", ["branchPhone"], {})
+@Entity("business_branch", { schema: "restroza_dev" })
 export class BusinessBranch {
-  @PrimaryGeneratedColumn({ type: "int", name: "id" })
+  @PrimaryGeneratedColumn({ type: "int", name: "id", unsigned: true })
   id: number;
 
-  @Column("varchar", { name: "branch_name", length: 100 })
+  @Column("varchar", { name: "branchName", length: 100 })
   branchName: string;
 
-  @Column("varchar", { name: "branch_address", length: 200 })
+  @Column("varchar", { name: "branchAddress", length: 200 })
   branchAddress: string;
 
-  @Column("varchar", { name: "branch_email", length: 100 })
+  @Column("varchar", { name: "branchEmail", unique: true, length: 100 })
   branchEmail: string;
 
-  @Column("varchar", { name: "branch_password", length: 100 })
+  @Column("varchar", { name: "branchPassword", length: 255 })
   branchPassword: string;
 
-  @Column("varchar", { name: "branch_phone", nullable: true, length: 20 })
+  @Column("varchar", { name: "branchPhone", nullable: true, length: 20 })
   branchPhone: string | null;
 
   @Column("decimal", {
-    name: "branch_tax",
+    name: "branchTax",
     nullable: true,
     precision: 5,
     scale: 2,
+    default: () => "'0.00'",
   })
   branchTax: string | null;
 
-  @Column("int", { name: "branch_owner_id", nullable: true })
-  branchOwnerId: number | null;
+  @Column("tinyint", { name: "isActive", width: 1, default: () => "'1'" })
+  isActive: boolean;
 
-  @Column("int", { name: "business_id", nullable: true })
-  businessId: number | null;
-
-  @Column("tinyint", {
-    name: "is_active",
-    nullable: true,
-    width: 1,
-    default: () => "'1'",
-  })
-  isActive: boolean | null;
-
-  @Column("datetime", {
+  @Column("timestamp", {
     name: "created_at",
     nullable: true,
-    default: () => "'now()'",
+    default: () => "CURRENT_TIMESTAMP",
   })
   createdAt: Date | null;
 
-  @Column("datetime", {
+  @Column("timestamp", {
     name: "updated_at",
     nullable: true,
-    default: () => "'now()'",
+    default: () => "CURRENT_TIMESTAMP",
   })
   updatedAt: Date | null;
+
+  @OneToMany(() => Userroles, (userroles) => userroles.branch)
+  userroles: Userroles[];
 }
