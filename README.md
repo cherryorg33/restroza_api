@@ -101,7 +101,7 @@ Nest is [MIT licensed](https://github.com/nestjs/nest/blob/master/LICENSE).
 
 typeorm-model-generator \
   -h localhost \
-  -d restroza \
+  -d restroza_dev \
   -u root \
   -x root \
   -e mysql \

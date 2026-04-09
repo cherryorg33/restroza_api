@@ -1,64 +1,74 @@
-import { Column, Entity, Index, PrimaryGeneratedColumn } from "typeorm";
+import {
+  Column,
+  Entity,
+  Index,
+  OneToMany,
+  PrimaryGeneratedColumn,
+} from "typeorm";
+import { Deliveries } from "./Deliveries";
+import { Employeedetails } from "./Employeedetails";
+import { Purchases } from "./Purchases";
+import { Userroles } from "./Userroles";
 
-@Index("employee_email", ["employeeEmail"], { unique: true })
-@Entity("users", { schema: "restroza" })
+@Index("idx_userEmail", ["userEmail"], {})
+@Index("idx_userPhone", ["userPhone"], {})
+@Index("userEmail", ["userEmail"], { unique: true })
+@Entity("users", { schema: "restroza_dev" })
 export class Users {
-  @PrimaryGeneratedColumn({ type: "int", name: "id" })
+  @PrimaryGeneratedColumn({ type: "int", name: "id", unsigned: true })
   id: number;
 
-  @Column("varchar", { name: "employee_name", length: 100 })
-  employeeName: string;
+  @Column("varchar", { name: "userName", length: 100 })
+  userName: string;
 
-  @Column("varchar", { name: "employee_email", unique: true, length: 100 })
-  employeeEmail: string;
+  @Column("varchar", { name: "userEmail", unique: true, length: 100 })
+  userEmail: string;
 
   @Column("varchar", {
-    name: "employee_password",
-    length: 100,
-    default: () => "'_utf8mb4'restroza''",
+    name: "userPassword",
+    length: 255,
+    default: () => "'Restroza@123'",
   })
-  employeePassword: string;
+  userPassword: string;
 
-  @Column("varchar", { name: "employee_address", nullable: true, length: 200 })
-  employeeAddress: string | null;
+  @Column("varchar", { name: "userAddress", nullable: true, length: 200 })
+  userAddress: string | null;
 
-  @Column("varchar", { name: "employee_phone", nullable: true, length: 20 })
-  employeePhone: string | null;
+  @Column("varchar", { name: "userPhone", nullable: true, length: 20 })
+  userPhone: string | null;
 
-  @Column("varchar", { name: "employee_aadhar", nullable: true, length: 20 })
-  employeeAadhar: string | null;
+  @Column("varchar", { name: "userAadhar", nullable: true, length: 20 })
+  userAadhar: string | null;
 
-  @Column("varchar", { name: "employee_photo", nullable: true, length: 255 })
-  employeePhoto: string | null;
+  @Column("varchar", { name: "userPhoto", nullable: true, length: 255 })
+  userPhoto: string | null;
 
-  @Column("int", { name: "business_id", nullable: true })
-  businessId: number | null;
+  @Column("tinyint", { name: "isActive", width: 1, default: () => "'1'" })
+  isActive: boolean;
 
-  @Column("int", { name: "branch_id", nullable: true })
-  branchId: number | null;
-
-  @Column("int", { name: "payment_type_id", nullable: true })
-  paymentTypeId: number | null;
-
-  @Column("tinyint", {
-    name: "is_active",
-    nullable: true,
-    width: 1,
-    default: () => "'1'",
-  })
-  isActive: boolean | null;
-
-  @Column("datetime", {
+  @Column("timestamp", {
     name: "created_at",
     nullable: true,
-    default: () => "'now()'",
+    default: () => "CURRENT_TIMESTAMP",
   })
   createdAt: Date | null;
 
-  @Column("datetime", {
+  @Column("timestamp", {
     name: "updated_at",
     nullable: true,
-    default: () => "'now()'",
+    default: () => "CURRENT_TIMESTAMP",
   })
   updatedAt: Date | null;
+
+  @OneToMany(() => Deliveries, (deliveries) => deliveries.deliveryUser)
+  deliveries: Deliveries[];
+
+  @OneToMany(() => Employeedetails, (employeedetails) => employeedetails.user)
+  employeedetails: Employeedetails[];
+
+  @OneToMany(() => Purchases, (purchases) => purchases.supplierUser)
+  purchases: Purchases[];
+
+  @OneToMany(() => Userroles, (userroles) => userroles.user)
+  userroles: Userroles[];
 }

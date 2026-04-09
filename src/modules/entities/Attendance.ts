@@ -1,53 +1,59 @@
-import { Column, Entity, PrimaryGeneratedColumn } from "typeorm";
+import {
+  Column,
+  Entity,
+  Index,
+  JoinColumn,
+  ManyToOne,
+  PrimaryGeneratedColumn,
+} from "typeorm";
+import { Employeedetails } from "./Employeedetails";
 
-@Entity("attendance", { schema: "restroza" })
+@Index("uniq_employee_date", ["employeeId", "attendanceDate"], { unique: true })
+@Entity("attendance", { schema: "restroza_dev" })
 export class Attendance {
-  @PrimaryGeneratedColumn({ type: "int", name: "id" })
+  @PrimaryGeneratedColumn({ type: "int", name: "id", unsigned: true })
   id: number;
 
-  @Column("int", { name: "user_id", nullable: true })
-  userId: number | null;
+  @Column("int", { name: "employeeId", unsigned: true })
+  employeeId: number;
 
-  @Column("int", { name: "branch_id", nullable: true })
-  branchId: number | null;
-
-  @Column("date", { name: "attendance_date" })
+  @Column("date", { name: "attendanceDate" })
   attendanceDate: string;
 
-  @Column("datetime", { name: "check_in_time", nullable: true })
-  checkInTime: Date | null;
+  @Column("datetime", { name: "checkIn", nullable: true })
+  checkIn: Date | null;
 
-  @Column("datetime", { name: "check_out_time", nullable: true })
-  checkOutTime: Date | null;
+  @Column("datetime", { name: "checkOut", nullable: true })
+  checkOut: Date | null;
 
   @Column("enum", {
     name: "status",
-    enum: ["Present", "Absent", "HalfDay", "Leave"],
+    nullable: true,
+    enum: ["PRESENT", "ABSENT", "HALF_DAY", "LEAVE"],
+    default: () => "'PRESENT'",
   })
-  status: "Present" | "Absent" | "HalfDay" | "Leave";
+  status: "PRESENT" | "ABSENT" | "HALF_DAY" | "LEAVE" | null;
 
   @Column("decimal", {
-    name: "total_hours",
+    name: "workingHours",
     nullable: true,
     precision: 5,
     scale: 2,
   })
-  totalHours: string | null;
+  workingHours: string | null;
 
-  @Column("varchar", { name: "notes", nullable: true, length: 500 })
-  notes: string | null;
-
-  @Column("datetime", {
+  @Column("timestamp", {
     name: "created_at",
     nullable: true,
-    default: () => "'now()'",
+    default: () => "CURRENT_TIMESTAMP",
   })
   createdAt: Date | null;
 
-  @Column("datetime", {
-    name: "updated_at",
-    nullable: true,
-    default: () => "'now()'",
-  })
-  updatedAt: Date | null;
+  @ManyToOne(
+    () => Employeedetails,
+    (employeedetails) => employeedetails.attendances,
+    { onDelete: "CASCADE", onUpdate: "NO ACTION" }
+  )
+  @JoinColumn([{ name: "employeeId", referencedColumnName: "id" }])
+  employee: Employeedetails;
 }

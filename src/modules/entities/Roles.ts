@@ -1,33 +1,36 @@
-import { Column, Entity, PrimaryGeneratedColumn } from "typeorm";
+import {
+  Column,
+  Entity,
+  Index,
+  OneToMany,
+  PrimaryGeneratedColumn,
+} from "typeorm";
+import { Userroles } from "./Userroles";
 
-@Entity("roles", { schema: "restroza" })
+@Index("unique_role_name", ["roleName"], { unique: true })
+@Entity("roles", { schema: "restroza_dev" })
 export class Roles {
-  @PrimaryGeneratedColumn({ type: "int", name: "id" })
+  @PrimaryGeneratedColumn({ type: "int", name: "id", unsigned: true })
   id: number;
 
-  @Column("varchar", { name: "role_name", length: 100 })
+  @Column("varchar", { name: "roleName", unique: true, length: 100 })
   roleName: string;
 
-  @Column("varchar", { name: "role_description", nullable: true, length: 200 })
-  roleDescription: string | null;
-
-  @Column("int", { name: "business_id", nullable: true })
-  businessId: number | null;
-
-  @Column("int", { name: "branch_id", nullable: true })
-  branchId: number | null;
+  @Column("varchar", { name: "roleDescription", length: 100 })
+  roleDescription: string;
 
   @Column("datetime", {
     name: "created_at",
-    nullable: true,
-    default: () => "'now()'",
+    default: () => "CURRENT_TIMESTAMP",
   })
-  createdAt: Date | null;
+  createdAt: Date;
 
   @Column("datetime", {
     name: "updated_at",
-    nullable: true,
-    default: () => "'now()'",
+    default: () => "CURRENT_TIMESTAMP",
   })
-  updatedAt: Date | null;
+  updatedAt: Date;
+
+  @OneToMany(() => Userroles, (userroles) => userroles.role)
+  userroles: Userroles[];
 }
