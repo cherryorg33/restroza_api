@@ -1,56 +1,41 @@
-import {
-  BadRequestException,
-  Injectable,
-  InternalServerErrorException,
-} from "@nestjs/common";
-import { InjectRepository } from "@nestjs/typeorm";
-import { Repository, DataSource } from "typeorm";
-import { Users } from "../entities/Users";
+import { BadRequestException, Injectable } from '@nestjs/common';
+import { DataSource } from 'typeorm';
+import { Users } from '../entities/Users';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
+import { LoggerService } from '../logger/logger.service';
 
 @Injectable()
 export class userService {
   constructor(
     @InjectRepository(Users)
-    private UserRepo: Repository<Users>,
-    private datasorce: DataSource
+    private usersrepo: Repository<Users>,
+    private datasource: DataSource,
+    private logger: LoggerService,
   ) {}
 
-  async createUser(data: Partial<Users>) {
+  //create user
+  async createUser(data: Users) {
     try {
-    } catch (error) {
-      console.log(error);
-      if (error instanceof BadRequestException) {
-        throw error;
+      const { userName, userAadhar, userAddress, userEmail, userPassword } =
+        data;
+
+      const checkEmail = await this.usersrepo.findOne({ userEmail: userEmail });
+
+      if (checkEmail) {
+        throw new BadRequestException(`Users already Exict`);
       }
 
-      throw new InternalServerErrorException("Create User Failed");
-    }
-  }
+      const result = await this.datasource.query(
+        `INSERT INTO users(userName,userAadhar , userAddress , userEmail , userPassword) and values (?,?,?,?,?)`,
+        [userName, userAadhar, userAddress, userEmail, userPassword],
+      );
 
-  async GetAllUsers() {
-    try {
-      const data = await this.datasorce.query(`select * from users`);
-      return data;
+      return {
+        message: 'users created',
+      };
     } catch (error) {
-      console.log(error);
-      if (error instanceof BadRequestException) {
-        throw error;
-      }
-
-      throw new InternalServerErrorException("Create User Failed");
-    }
-  }
-
-  async GetdataById(id: number) {
-    try {
-      // const data = await this.UserRepo.findOneBy(id:id);
-    } catch (error) {
-      console.log(error);
-      if (error instanceof BadRequestException) {
-        throw error;
-      }
-
-      throw new InternalServerErrorException("Create User Failed");
+      this.logger.error(`${error}`);
     }
   }
 }
