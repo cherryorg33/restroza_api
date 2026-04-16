@@ -45,14 +45,7 @@ async function bootstrap() {
   // ✅ Cookie parser
   app.use(cookieParser());
 
-  // ✅ Global validation
-  // app.useGlobalPipes(
-  //   new ValidationPipe({
-  //     whitelist: true, // remove unwanted fields
-  //     forbidNonWhitelisted: true, // throw error
-  //     transform: true, // auto transform DTO
-  //   })
-  // );
+
 
   // ✅ Start server
   const PORT = process.env.PORT || GLOBAL_CONFIG.nest.port;
